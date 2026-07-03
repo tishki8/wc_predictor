@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WC Predictor — Football Match Forecaster</title>
+  <meta name="description" content="Dixon-Coles football match predictor for the 2026 World Cup. Predict group-stage and knockout outcomes with layered probability breakdowns.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="page-wrapper">
+
+  <!-- ── Header ─────────────────────────────────────────────────── -->
+  <header class="site-header">
+    <div class="header-brand">
+      <div class="header-logo">⚽</div>
+      <div>
+        <div class="header-title">WC Predictor</div>
+        <div class="header-sub">Dixon-Coles Model · 2026 World Cup</div>
+      </div>
+    </div>
+    <div class="header-badge">Live Predictions</div>
+  </header>
+
+  <div class="pitch-divider"></div>
+
+  <!-- ── Section 1: Team & Stage Selector ──────────────────────── -->
+  <section class="selector-panel" id="selector">
+    <div class="panel-label">Configure Match</div>
+
+    <div class="selector-row">
+      <!-- Home team -->
+      <div class="form-group">
+        <label class="form-label" for="home-display">Home Team</label>
+        <div class="select-wrapper" id="home-wrapper">
+          <button class="team-display-btn" id="home-display" aria-haspopup="listbox" aria-expanded="false">
+            <span id="home-display-text">Select team…</span>
+            <span class="chevron">▼</span>
+          </button>
+          <div class="team-search" id="home-search" role="listbox">
+            <input class="team-search-input" id="home-search-input" type="text" placeholder="Search team…" autocomplete="off">
+            <div class="team-search-list" id="home-search-list"></div>
+          </div>
+        </div>
+        <input type="hidden" id="home-team-val">
+      </div>
+
+      <div class="vs-badge">VS</div>
+
+      <!-- Away team -->
+      <div class="form-group">
+        <label class="form-label" for="away-display">Away Team</label>
+        <div class="select-wrapper" id="away-wrapper">
+          <button class="team-display-btn" id="away-display" aria-haspopup="listbox" aria-expanded="false">
+            <span id="away-display-text">Select team…</span>
+            <span class="chevron">▼</span>
+          </button>
+          <div class="team-search" id="away-search" role="listbox">
+            <input class="team-search-input" id="away-search-input" type="text" placeholder="Search team…" autocomplete="off">
+            <div class="team-search-list" id="away-search-list"></div>
+          </div>
+        </div>
+        <input type="hidden" id="away-team-val">
+      </div>
+    </div>
+
+    <!-- Stage + Controls row -->
+    <div class="selector-controls">
+      <div class="form-group" style="flex:none;">
+        <div class="form-label">Stage</div>
+        <div class="stage-pills" id="stage-pills">
+          <button class="stage-pill active" data-stage="group">Group</button>
+          <button class="stage-pill" data-stage="r32">R32</button>
+          <button class="stage-pill" data-stage="r16">R16</button>
+          <button class="stage-pill" data-stage="qf">QF</button>
+          <button class="stage-pill" data-stage="sf">SF</button>
+          <button class="stage-pill" data-stage="final">Final</button>
+        </div>
+      </div>
+
+      <div style="flex:none;">
+        <div class="form-label" style="margin-bottom:6px;">Neutral Venue</div>
+        <div class="toggle-row">
+          <label class="toggle-switch" for="neutral-toggle">
+            <input type="checkbox" id="neutral-toggle" checked>
+            <span class="toggle-track"></span>
+          </label>
+          <span class="toggle-label" id="neutral-label">On (Tournament)</span>
+        </div>
+      </div>
+
+      <div style="margin-left:auto; display:flex; align-items:center; gap:12px;">
+        <div class="spinner" id="predict-spinner"></div>
+        <button class="predict-btn" id="predict-btn" onclick="runPrediction()">
+          Predict
+        </button>
+      </div>
+    </div>
+
+    <div class="error-msg" id="error-msg"></div>
+  </section>
+
+  <div class="pitch-divider"></div>
+
+  <!-- ── Section 2: Prediction Result ──────────────────────────── -->
+  <section class="result-section" id="result-section">
+    <div class="result-card" id="result-card">
+
+      <!-- Match header -->
+      <div class="result-header">
+        <div class="result-team" id="res-home-block">
+          <div class="result-team-name" id="res-home-name">—</div>
+          <div class="result-team-xg" id="res-home-xg"></div>
+        </div>
+        <div class="result-vs">
+          <div style="font-size:22px;font-weight:900;font-family:var(--font-num)">VS</div>
+          <span class="result-stage-badge" id="res-stage-badge">Group</span>
+        </div>
+        <div class="result-team" id="res-away-block">
+          <div class="result-team-name" id="res-away-name">—</div>
+          <div class="result-team-xg" id="res-away-xg"></div>
+        </div>
+      </div>
+
+      <!-- Result body injected by JS -->
+      <div id="result-body"></div>
+
+    </div>
+    <div class="pitch-divider"></div>
+  </section>
+
+  <!-- ── Section 3: Model Performance ──────────────────────────── -->
+  <section style="margin-bottom:28px;">
+    <div class="section-heading">Model Performance</div>
+    <div class="backtest-panel" id="backtest-panel">
+      <div class="backtest-icon">📊</div>
+      <div class="backtest-info">
+        <div class="backtest-title">Backtested vs 2022 FIFA World Cup</div>
+        <div class="backtest-sub" id="backtest-subtitle">64 matches · Small but honest edge over baseline</div>
+      </div>
+      <div class="backtest-stats" id="backtest-stats">
+        <div class="backtest-stat">
+          <div class="backtest-stat-val" id="bt-accuracy">—</div>
+          <div class="backtest-stat-label">Accuracy</div>
+        </div>
+        <div class="backtest-stat">
+          <div class="backtest-stat-val" id="bt-brier">—</div>
+          <div class="backtest-stat-label">Brier Score</div>
+        </div>
+        <div class="backtest-stat">
+          <div class="backtest-stat-val" id="bt-logloss">—</div>
+          <div class="backtest-stat-label">Log Loss</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="pitch-divider"></div>
+
+  <!-- ── Section 4: Live Fixture Tracker ───────────────────────── -->
+  <section>
+    <div class="section-heading">
+      <span class="live-dot"></span>
+      Live Fixture Predictions
+    </div>
+    <div class="fixtures-table-wrap">
+      <table class="fixtures-table" id="fixtures-table">
+        <thead>
+          <tr>
+            <th>Match</th>
+            <th>Date</th>
+            <th>Stage</th>
+            <th class="right">Home Win</th>
+            <th class="right">Draw</th>
+            <th class="right">Away Win</th>
+            <th class="right">Advances</th>
+            <th class="center">Result</th>
+          </tr>
+        </thead>
+        <tbody id="fixtures-body">
+          <tr><td colspan="8" style="text-align:center; padding:24px; color:var(--white-40); font-style:italic;">Loading fixtures…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div><!-- /page-wrapper -->
+
+<script src="/app.js"></script>
+</body>
+</html>

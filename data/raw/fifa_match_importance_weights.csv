@@ -1,0 +1,10 @@
+match_type,importance_I
+Friendly (outside calendar),5
+Friendly (during calendar),10
+Nations League group phase,15
+Nations League playoff/final,25
+WC/Confederation qualifiers,25
+Confederation final comp. (up to QF),35
+Confederation final comp. (QF onward),40
+FIFA World Cup (up to QF),50
+FIFA World Cup (QF onward),60

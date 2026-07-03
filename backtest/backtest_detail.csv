@@ -1,0 +1,65 @@
+match,date,P(H),P(D),P(A),actual,correct
+Qatar v Ecuador,2022-11-20,0.527,0.293,0.18,A,False
+United States v Wales,2022-11-21,0.659,0.212,0.13,D,False
+England v Iran,2022-11-21,0.469,0.272,0.259,H,True
+Senegal v Netherlands,2022-11-21,0.266,0.259,0.476,A,True
+France v Australia,2022-11-22,0.578,0.253,0.169,H,True
+Denmark v Tunisia,2022-11-22,0.551,0.251,0.198,D,False
+Argentina v Saudi Arabia,2022-11-22,0.833,0.122,0.045,A,False
+Mexico v Poland,2022-11-22,0.569,0.247,0.184,D,False
+Germany v Japan,2022-11-23,0.517,0.261,0.222,A,False
+Spain v Costa Rica,2022-11-23,0.656,0.217,0.127,H,True
+Morocco v Croatia,2022-11-23,0.367,0.298,0.335,D,False
+Belgium v Canada,2022-11-23,0.68,0.202,0.118,H,True
+Switzerland v Cameroon,2022-11-24,0.541,0.264,0.194,H,True
+Brazil v Serbia,2022-11-24,0.812,0.127,0.061,H,True
+Uruguay v South Korea,2022-11-24,0.511,0.267,0.222,D,False
+Portugal v Ghana,2022-11-24,0.758,0.165,0.077,H,True
+Wales v Iran,2022-11-25,0.333,0.268,0.4,A,True
+England v United States,2022-11-25,0.501,0.253,0.246,D,False
+Netherlands v Ecuador,2022-11-25,0.614,0.244,0.142,D,False
+Qatar v Senegal,2022-11-25,0.519,0.269,0.212,A,False
+Poland v Saudi Arabia,2022-11-26,0.42,0.305,0.275,H,True
+Argentina v Mexico,2022-11-26,0.661,0.204,0.134,H,True
+Tunisia v Australia,2022-11-26,0.388,0.284,0.328,A,False
+France v Denmark,2022-11-26,0.594,0.244,0.162,H,True
+Japan v Costa Rica,2022-11-27,0.663,0.205,0.132,A,False
+Spain v Germany,2022-11-27,0.611,0.218,0.171,D,False
+Belgium v Morocco,2022-11-27,0.551,0.268,0.181,A,False
+Croatia v Canada,2022-11-27,0.591,0.245,0.164,H,True
+South Korea v Ghana,2022-11-28,0.613,0.236,0.151,A,False
+Portugal v Uruguay,2022-11-28,0.488,0.274,0.238,H,True
+Brazil v Switzerland,2022-11-28,0.749,0.168,0.083,H,True
+Cameroon v Serbia,2022-11-28,0.338,0.272,0.39,D,False
+Ecuador v Senegal,2022-11-29,0.396,0.3,0.304,A,False
+Qatar v Netherlands,2022-11-29,0.256,0.284,0.46,A,True
+Wales v England,2022-11-29,0.202,0.225,0.574,A,True
+Iran v United States,2022-11-29,0.417,0.283,0.3,A,False
+Poland v Argentina,2022-11-30,0.18,0.249,0.571,A,True
+Saudi Arabia v Mexico,2022-11-30,0.317,0.279,0.404,A,True
+Australia v Denmark,2022-11-30,0.39,0.294,0.316,H,True
+Tunisia v France,2022-11-30,0.143,0.219,0.638,H,False
+Croatia v Belgium,2022-12-01,0.412,0.284,0.304,D,False
+Canada v Morocco,2022-12-01,0.236,0.268,0.496,A,True
+Japan v Spain,2022-12-01,0.241,0.262,0.497,H,False
+Costa Rica v Germany,2022-12-01,0.261,0.254,0.485,A,True
+Serbia v Switzerland,2022-12-02,0.389,0.268,0.343,A,False
+Cameroon v Brazil,2022-12-02,0.075,0.154,0.771,H,False
+Ghana v Uruguay,2022-12-02,0.251,0.264,0.485,A,True
+South Korea v Portugal,2022-12-02,0.246,0.262,0.492,H,False
+Netherlands v United States,2022-12-03,0.533,0.278,0.189,H,True
+Argentina v Australia,2022-12-03,0.693,0.198,0.109,H,True
+France v Poland,2022-12-04,0.627,0.233,0.139,H,True
+England v Senegal,2022-12-04,0.616,0.221,0.163,H,True
+Japan v Croatia,2022-12-05,0.386,0.292,0.322,A,False
+Brazil v South Korea,2022-12-05,0.692,0.201,0.108,H,True
+Morocco v Spain,2022-12-06,0.281,0.277,0.441,H,False
+Portugal v Switzerland,2022-12-06,0.547,0.248,0.205,H,True
+Croatia v Brazil,2022-12-09,0.224,0.267,0.509,H,False
+Netherlands v Argentina,2022-12-09,0.36,0.284,0.357,A,False
+Morocco v Portugal,2022-12-10,0.318,0.274,0.408,H,False
+England v France,2022-12-10,0.478,0.252,0.27,A,False
+Argentina v Croatia,2022-12-13,0.56,0.253,0.187,H,True
+France v Morocco,2022-12-14,0.563,0.255,0.182,H,True
+Croatia v Morocco,2022-12-17,0.426,0.288,0.286,H,True
+Argentina v France,2022-12-18,0.468,0.271,0.261,H,True
