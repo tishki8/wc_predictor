@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "app/server.py": {
+      "maxDuration": 30,
+      "excludeFiles": "{data/raw/**,*.ipynb,.ipynb_checkpoints/**}"
+    }
+  }
+}

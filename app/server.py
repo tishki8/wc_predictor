@@ -1,6 +1,9 @@
 """
 Flask backend for the World Cup Match Predictor UI.
 
+All static files (index.html, style.css, app.js) are served by Vercel's
+CDN from the public/ folder — this server only exposes /api/* routes.
+
 Routes
 ------
 GET  /api/teams          → sorted list of all team names
@@ -12,14 +15,26 @@ Stage → importance mapping (FIFA weights):
   group        → 25
   r32 / r16    → 50
   qf / sf / final → 60
+
+Paths: all file references are resolved relative to the project root
+(parent of this file's directory) so they work identically on Vercel
+and locally.
 """
 
 import json
 import pathlib
 import pickle
+import sys
+
+# Ensure the project root is on sys.path so 'models.*' imports work whether
+# this file is run as 'python app/server.py' (cwd = project root) or via
+# Vercel's serverless runner (cwd may vary).
+_ROOT = pathlib.Path(__file__).parent.parent.resolve()
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
 
 import pandas as pd
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 
 # ── Paths ────────────────────────────────────────────────────────────────────
@@ -40,7 +55,7 @@ STAGE_IMPORTANCE = {
 }
 
 # ── App + model init (loaded once at startup) ─────────────────────────────────
-app = Flask(__name__, static_folder="static", static_url_path="")
+app = Flask(__name__)
 CORS(app)
 
 print("Loading model…", flush=True)
@@ -69,7 +84,14 @@ print(f"  {len(TEAMS)} teams.", flush=True)
 
 @app.route("/")
 def index():
-    return app.send_static_file("index.html")
+    """Serve the SPA locally. On Vercel, public/ is served by CDN instead."""
+    return send_from_directory(ROOT / "public", "index.html")
+
+
+@app.route("/<path:filename>")
+def static_files(filename):
+    """Serve CSS/JS locally from public/. Vercel CDN handles this in prod."""
+    return send_from_directory(ROOT / "public", filename)
 
 
 @app.route("/api/teams")
