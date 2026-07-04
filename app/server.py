@@ -25,7 +25,6 @@ and locally.
 """
 
 import json
-import mimetypes
 import pathlib
 import pickle
 import sys
@@ -84,55 +83,10 @@ TEAMS = sorted(set(
 ))
 print(f"  {len(TEAMS)} teams.", flush=True)
 
-# ── Preload every static file into memory at IMPORT TIME ─────────────────────
-# Vercel's Python bundler traces file access via STATIC ANALYSIS of the code
-# (not by executing it), so it can only include files referenced by literal,
-# predictable paths — a dynamic directory scan (e.g. glob) can't be resolved
-# ahead of time and gets silently skipped. Naming each file explicitly here
-# gives the analyzer something concrete to trace and bundle correctly.
-#
-# IMPORTANT: if you add new files to public/, add their names to this list too.
-STATIC_FILENAMES = ["index.html", "style.css", "app.js"]
-
-print("Preloading static files…", flush=True)
-STATIC_FILES = {}
-for name in STATIC_FILENAMES:
-    file_path = PUBLIC_PATH / name
-    try:
-        with open(file_path, "rb") as f:
-            STATIC_FILES[name] = f.read()
-    except FileNotFoundError:
-        print(f"  WARNING: {name} not found at {file_path}", flush=True)
-print(f"  {len(STATIC_FILES)} static files preloaded: {list(STATIC_FILES.keys())}", flush=True)
-
-
-# ── Static file routes (served from the in-memory cache above) ──────────────
-
-@app.route("/")
-def index():
-    content = STATIC_FILES.get("index.html")
-    if content is None:
-        return "index.html not found in preloaded static files", 500
-    return content, 200, {"Content-Type": "text/html"}
-
-
-@app.route("/<path:filename>")
-def static_files(filename):
-    # Don't let this route accidentally swallow /api/* — Flask matches
-    # exact routes first, but this guard is a safety net in case the
-    # ordering ever changes.
-    if filename.startswith("api/"):
-        return jsonify({"error": "Not found"}), 404
-
-    content = STATIC_FILES.get(filename)
-    if content is None:
-        return "Not found", 404
-
-    content_type, _ = mimetypes.guess_type(filename)
-    return content, 200, {"Content-Type": content_type or "application/octet-stream"}
-
-
 # ── API routes ────────────────────────────────────────────────────────────────
+# Static files (index.html, style.css, app.js) are NOT served by Flask at
+# all — vercel.json routes "/" and everything else to Vercel's own CDN,
+# which serves directly from public/. Flask here only ever handles /api/*.
 
 @app.route("/api/teams")
 def api_teams():

@@ -6,7 +6,9 @@
       "excludeFiles": "{data/raw/**,*.ipynb,.ipynb_checkpoints/**}"
     }
   },
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/app/server.py" }
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/app/server.py" },
+    { "src": "/$", "dest": "/index.html" },
+    { "handle": "filesystem" }
   ]
 }
