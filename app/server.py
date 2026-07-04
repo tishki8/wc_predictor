@@ -1,15 +1,18 @@
 """
 Flask backend for the World Cup Match Predictor UI.
 
-All static files (index.html, style.css, app.js) are served by Vercel's
-CDN from the public/ folder — this server only exposes /api/* routes.
+All routes — static files AND /api/* — are served by this single Flask
+function. vercel.json rewrites every request here explicitly, so there's
+no dependency on Vercel's automatic public/ CDN detection.
 
 Routes
 ------
-GET  /api/teams          → sorted list of all team names
-GET  /api/backtest       → backtest_report.json contents
-GET  /api/live-fixtures  → live_predictions.csv as JSON
-POST /api/predict        → {home, away, stage, neutral} → prediction dict
+GET  /                    → index.html
+GET  /<filename>          → any other static file in public/ (style.css, app.js, ...)
+GET  /api/teams           → sorted list of all team names
+GET  /api/backtest        → backtest_report.json contents
+GET  /api/live-fixtures   → live_predictions.csv as JSON
+POST /api/predict         → {home, away, stage, neutral} → prediction dict
 
 Stage → importance mapping (FIFA weights):
   group        → 25
@@ -22,6 +25,7 @@ and locally.
 """
 
 import json
+import mimetypes
 import pathlib
 import pickle
 import sys
@@ -34,7 +38,7 @@ if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
 import pandas as pd
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 # ── Paths ────────────────────────────────────────────────────────────────────
@@ -43,6 +47,7 @@ MODEL_PATH   = ROOT / "models" / "dixon_coles_model.pkl"
 MATCHES_PATH = ROOT / "data" / "processed" / "matches_full.csv"
 BACKTEST_PATH = ROOT / "backtest" / "backtest_report.json"
 LIVE_PATH    = ROOT / "app" / "live_predictions.csv"
+PUBLIC_PATH  = ROOT / "public"
 
 # ── Stage → FIFA importance weight ───────────────────────────────────────────
 STAGE_IMPORTANCE = {
@@ -80,19 +85,35 @@ TEAMS = sorted(set(
 print(f"  {len(TEAMS)} teams.", flush=True)
 
 
-# ── Routes ────────────────────────────────────────────────────────────────────
+# ── Static file routes (plain file reads — no send_from_directory) ──────────
 
 @app.route("/")
 def index():
-    """Serve the SPA locally. On Vercel, public/ is served by CDN instead."""
-    return send_from_directory(ROOT / "public", "index.html")
+    index_path = PUBLIC_PATH / "index.html"
+    with open(index_path, "r", encoding="utf-8") as f:
+        html = f.read()
+    return html, 200, {"Content-Type": "text/html"}
 
 
 @app.route("/<path:filename>")
 def static_files(filename):
-    """Serve CSS/JS locally from public/. Vercel CDN handles this in prod."""
-    return send_from_directory(ROOT / "public", filename)
+    # Don't let this route accidentally swallow /api/* — Flask matches
+    # exact routes first, but this guard is a safety net in case the
+    # ordering ever changes.
+    if filename.startswith("api/"):
+        return jsonify({"error": "Not found"}), 404
 
+    file_path = PUBLIC_PATH / filename
+    if not file_path.exists() or not file_path.is_file():
+        return "Not found", 404
+
+    content_type, _ = mimetypes.guess_type(str(file_path))
+    with open(file_path, "rb") as f:
+        content = f.read()
+    return content, 200, {"Content-Type": content_type or "application/octet-stream"}
+
+
+# ── API routes ────────────────────────────────────────────────────────────────
 
 @app.route("/api/teams")
 def api_teams():
