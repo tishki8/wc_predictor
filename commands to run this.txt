@@ -1,0 +1,2 @@
+python app/server.py
+commands to run wc-predictor
