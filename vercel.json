@@ -3,6 +3,7 @@
   "functions": {
     "app/server.py": {
       "maxDuration": 30,
+      "includeFiles": "public/**",
       "excludeFiles": "{data/raw/**,*.ipynb,.ipynb_checkpoints/**}"
     }
   },
