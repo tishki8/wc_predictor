@@ -84,15 +84,32 @@ TEAMS = sorted(set(
 ))
 print(f"  {len(TEAMS)} teams.", flush=True)
 
+# ── Preload every static file into memory at IMPORT TIME ─────────────────────
+# Vercel's Python bundler only includes files that are actually opened while
+# the module loads (the "build trace" phase) — files opened later, inside a
+# request handler, are invisible to it and get silently left out of the
+# deployed bundle. Reading everything here, at import time, guarantees these
+# files are traced and packaged correctly, and means requests never touch
+# disk at all (small speed bonus too).
+print("Preloading static files…", flush=True)
+STATIC_FILES = {}
+if PUBLIC_PATH.exists():
+    for file_path in PUBLIC_PATH.rglob("*"):
+        if file_path.is_file():
+            rel_path = file_path.relative_to(PUBLIC_PATH).as_posix()
+            with open(file_path, "rb") as f:
+                STATIC_FILES[rel_path] = f.read()
+print(f"  {len(STATIC_FILES)} static files preloaded: {list(STATIC_FILES.keys())}", flush=True)
 
-# ── Static file routes (plain file reads — no send_from_directory) ──────────
+
+# ── Static file routes (served from the in-memory cache above) ──────────────
 
 @app.route("/")
 def index():
-    index_path = PUBLIC_PATH / "index.html"
-    with open(index_path, "r", encoding="utf-8") as f:
-        html = f.read()
-    return html, 200, {"Content-Type": "text/html"}
+    content = STATIC_FILES.get("index.html")
+    if content is None:
+        return "index.html not found in preloaded static files", 500
+    return content, 200, {"Content-Type": "text/html"}
 
 
 @app.route("/<path:filename>")
@@ -103,13 +120,11 @@ def static_files(filename):
     if filename.startswith("api/"):
         return jsonify({"error": "Not found"}), 404
 
-    file_path = PUBLIC_PATH / filename
-    if not file_path.exists() or not file_path.is_file():
+    content = STATIC_FILES.get(filename)
+    if content is None:
         return "Not found", 404
 
-    content_type, _ = mimetypes.guess_type(str(file_path))
-    with open(file_path, "rb") as f:
-        content = f.read()
+    content_type, _ = mimetypes.guess_type(filename)
     return content, 200, {"Content-Type": content_type or "application/octet-stream"}
 
 
