@@ -6,9 +6,9 @@
       "excludeFiles": "{data/raw/**,*.ipynb,.ipynb_checkpoints/**}"
     }
   },
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "rewrites": [
-    { "source": "/", "destination": "/index.html" }
+  "routes": [
+    { "src": "/$", "dest": "/index.html" },
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/app/server.py" }
   ]
 }
